@@ -21,7 +21,7 @@ Please provide the following before attempting to use this utility:
 ## Installation
 
 ```bash
-pip install --upgrade shout
+pip install --upgrade etna-shout
 ```
 
 ## Example declaration
