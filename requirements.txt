@@ -1,0 +1,2 @@
+arrow==0.14.1
+etnawrapper>=2.1.1
