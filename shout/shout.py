@@ -49,19 +49,20 @@ def parse_args() -> argparse.ArgumentParser:
 
 def get_wrapper():
     """Instantiate the APIWrapper."""
+    # TODO: Config-based credential management ?
     login = os.environ.get("ETNA_USER")
     return EtnaWrapper(login=login, password=os.environ.get("ETNA_PASS"))
 
 
-def find_targeted_activity_details(activities, uv_name, project, verbose=False) -> typing.Tuple[int, int]:
+def find_targeted_activity_details(
+    activities: dict, uv_name: str, project: str, verbose=False
+) -> typing.Tuple[int, int]:
     """Pretty print sub activities.
 
-    Display:
-     - activity name
-     - activity id
-     - project name
-     - module_id
+    Find the matching (module_id,activity_id)
+    Raise ValueError in case None is found
     """
+    # TODO: Avoid first found approach, prompt on conflict
     for name, value in activities.items():
         if not value.get("project"):
             verbose and print("Could not find a project for", name)
@@ -73,7 +74,7 @@ def find_targeted_activity_details(activities, uv_name, project, verbose=False) 
     raise ValueError("Could not find matching UV/project")
 
 
-def prepare_payload(module_id, activity_id, parsed):
+def prepare_payload(module_id: int, activity_id: int, parsed):
     """Format the payload in order to send the declaration."""
     data = {"module": module_id, "activity": activity_id}
     start_date = parsed.start_date
@@ -85,6 +86,15 @@ def prepare_payload(module_id, activity_id, parsed):
     }
     data["declaration"] = declaration
     return data
+
+
+def display_payload(payload: dict):
+    print("From: {}".format(payload["declaration"]["start"]))
+    print("To: {}".format(payload["declaration"]["end"]))
+    print("module_id:".format(payload["module"]))
+    print("activity_id:".format(payload["activity"]))
+    print("Content:")
+    print(payload["declaration"]["content"])
 
 
 def main():
@@ -99,7 +109,10 @@ def main():
     )
     payload = prepare_payload(module_id, activity_id, parsed)
     if not parsed.fast:
-        print(payload)
+        display_payload(payload)
+        input("If you wish to cancel, press ^C")
+
+    wrapper.declare_log(module_id, activity_id, payload)
 
 
 if __name__ == "__main__":
