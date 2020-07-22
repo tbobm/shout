@@ -5,7 +5,7 @@ deps = ['requests', 'etnawrapper>=2.1.1']
 
 setup(
     name="etna-shout",
-    version="0.1.0",
+    version="0.2.0",
     description="Command line tool to interact with ETNA's APIs",
     url="https://github.com/tbobm/shout",
     author='Theo "Bob" Massard',
