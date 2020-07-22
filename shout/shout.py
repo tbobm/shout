@@ -63,12 +63,15 @@ def find_targeted_activity_details(
     Raise ValueError in case None is found
     """
     # TODO: Avoid first found approach, prompt on conflict
+    project_type = ''
     for name, value in activities.items():
-        if not value.get("project"):
-            verbose and print("Could not find a project for", name)
-            continue
         if name.lower() == uv_name.lower():
-            activity = value["project"][0]
+            if not value.get("project"):
+                activity = value.get('quest')[0]
+                project_type == 'quest'
+            else:
+                activity = value["project"][0]
+                project_type == 'project'
             if project.lower() in activity["name"].lower():
                 return activity["module_id"], activity["activity_id"]
     raise ValueError("Could not find matching UV/project")
@@ -76,6 +79,7 @@ def find_targeted_activity_details(
 
 def prepare_payload(module_id: int, activity_id: int, parsed):
     """Format the payload in order to send the declaration."""
+    # TODO: Create declaration structure
     data = {"module": module_id, "activity": activity_id}
     start_date = parsed.start_date
     end_date = parsed.end_date
@@ -85,14 +89,15 @@ def prepare_payload(module_id: int, activity_id: int, parsed):
         "content": parsed.declaration.read(),
     }
     data["declaration"] = declaration
+    print(data)
     return data
 
 
 def display_payload(payload: dict):
     print("From: {}".format(payload["declaration"]["start"]))
     print("To: {}".format(payload["declaration"]["end"]))
-    print("module_id:".format(payload["module"]))
-    print("activity_id:".format(payload["activity"]))
+    print("module_id: {}".format(payload["module"]))
+    print("activity_id: {}".format(payload["activity"]))
     print("Content:")
     print(payload["declaration"]["content"])
 
@@ -102,17 +107,16 @@ def main():
     parsed = parse_args()
     wrapper = get_wrapper()
     activities = wrapper.get_current_activities()
-    print("Found the following current activities:")
-    print(" - ".join(sorted(activities)))
     module_id, activity_id = find_targeted_activity_details(
         activities, parsed.uv, parsed.project, parsed.v
     )
+    print(module_id, activity_id)
     payload = prepare_payload(module_id, activity_id, parsed)
     if not parsed.fast:
         display_payload(payload)
         input("If you wish to cancel, press ^C")
 
-    wrapper.declare_log(module_id, activity_id, payload)
+    response = wrapper.declare_log(module_id, payload)
 
 
 if __name__ == "__main__":
