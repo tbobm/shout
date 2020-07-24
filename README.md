@@ -34,6 +34,8 @@ Actions: Do something
 Resultats: Something does foo
 ```
 
+See [the example directory](./examples/)
+
 
 ## Notice
 
