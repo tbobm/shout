@@ -4,8 +4,9 @@ _When declaring your logs is not enough_
 
 ## Usage
 
+
 ```bash
-shout -u TIC-DVC4 -p bomberman -s "2019-06-3 9:00" -e "2019-06-3 12:00" -d declaration.md
+shout -u TIC-DVC4 -p bomberman -s "9:00" -e "12:00 -d declaration.md
 ```
 
 ## Requirements
@@ -42,3 +43,12 @@ See [the example directory](./examples/)
 In case you'd consider this shady in any way, the entirety of the source code is available for you to read.
 
 Etnawrapper: https://github.com/tbobm/etnawrapper
+
+## Self-promotion
+
+If you want to easily get a list for the `UV` and the `project` flags, etnawrapper allows you to get the list of the current activities by running:
+
+```bash
+# implies you propertly set your ETNA_* credentials
+$ etna activities list
+```

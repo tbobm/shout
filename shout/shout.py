@@ -5,6 +5,7 @@ Powered by etnawrapper: github.com/tbobm/etnawrapper
 """
 import os
 import argparse
+import datetime
 import typing
 
 from etnawrapper import EtnaWrapper
@@ -13,7 +14,7 @@ from etnawrapper import EtnaWrapper
 __author__ = 'Theo "Bob" Massard <massar_t@etna-alternance.net>'
 
 
-def parse_args() -> argparse.ArgumentParser:
+def parse_args() -> argparse.Namespace:
     """Prepare parser for command-line interaction."""
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -32,10 +33,20 @@ def parse_args() -> argparse.ArgumentParser:
         help="File containing the declaration",
     )
     parser.add_argument(
-        "-s", "--start-date", type=str, required=True, help="Lower bound working limit"
+        "-s", "--start-time",
+        type=str, required=True,
+        help="Start hour of working session",
     )
     parser.add_argument(
-        "-e", "--end-date", type=str, required=True, help="Upper bound working limit"
+        "-e", "--end-time",
+        type=str, required=True,
+        help="End hour of the working session",
+    )
+    parser.add_argument(
+        "-y",
+        "--yesterday",
+        action="store_true",
+        help="Declare for the previous day",
     )
     parser.add_argument(
         "-f",
@@ -77,12 +88,38 @@ def find_targeted_activity_details(
     raise ValueError("Could not find matching UV/project")
 
 
-def prepare_payload(module_id: int, activity_id: int, parsed):
+def set_date(arguments: argparse.Namespace) -> datetime.datetime:
+    date = datetime.datetime.today()
+    if arguments.yesterday:
+        date -= datetime.timedelta(days=1)
+    return date.replace(second=0, microsecond=0)
+
+
+def extract_time_limit(time_limit: str) -> typing.Tuple[int, int]:
+    """Extract hour and minutes from string.
+
+    >>> extract_time_limit("09:00")
+    9, 0
+    >>> extract_time_limit("14:30")
+    14, 30
+    """
+    data = time_limit.split(':')
+    parts_count = len(data)
+    if parts_count == 1:
+        print(f'Could not find minutes in {time_limit}, defaulting to 0')
+        return int(data[0]), 0
+    return int(data[0]), int(data[1])
+
+
+def prepare_payload(module_id: int, activity_id: int, parsed: argparse.Namespace):
     """Format the payload in order to send the declaration."""
     # TODO: Create declaration structure
     data = {"module": module_id, "activity": activity_id}
-    start_date = parsed.start_date
-    end_date = parsed.end_date
+    day = set_date(parsed)
+    start_hour, start_minute = extract_time_limit(parsed.start_time)
+    end_hour, end_minute = extract_time_limit(parsed.end_time)
+    start_date = day.replace(hour=start_hour, minute=start_minute)
+    end_date = day.replace(hour=end_hour, minute=end_minute)
     declaration = {
         "start": start_date,
         "end": end_date,
