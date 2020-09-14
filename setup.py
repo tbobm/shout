@@ -1,11 +1,11 @@
 from setuptools import setup
 
 
-deps = ['requests', 'etnawrapper>=2.1.1']
+deps = ['requests', 'etnawrapper>=2.1.1', 'click']
 
 setup(
     name="etna-shout",
-    version="0.3.0",
+    version="1.0.0",
     description="Command line tool to interact with ETNA's APIs",
     url="https://github.com/tbobm/shout",
     author='Theo "Bob" Massard',
