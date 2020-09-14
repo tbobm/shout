@@ -29,7 +29,6 @@ def parse_args() -> argparse.Namespace:
         "-d",
         "--declaration",
         type=argparse.FileType("r"),
-        required=True,
         help="File containing the declaration",
     )
     parser.add_argument(
