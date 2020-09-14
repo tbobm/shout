@@ -167,8 +167,13 @@ RESULTS
     payload["declaration"]["content"] = content
     if not fast:
         display_payload(payload)
-        input("If you wish to cancel, press ^C")
+        try:
+            input("If you wish to cancel, press ^C")
+        except KeyboardInterrupt:
+            click.secho('Cancelling.', fg='red')
+            return
 
+    click.secho('Firing declaration!', bold=True)
     response = wrapper.declare_log(module_id, payload)
     response.raise_for_status()
 
