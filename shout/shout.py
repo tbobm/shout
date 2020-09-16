@@ -5,6 +5,7 @@ Powered by etnawrapper: github.com/tbobm/etnawrapper
 """
 import os
 import datetime
+from textwrap import dedent
 import typing
 
 import click
@@ -73,8 +74,8 @@ def prepare_payload(data: dict, start, end, yesterday):
     start_date = day.replace(hour=start_hour, minute=start_minute)
     end_date = day.replace(hour=end_hour, minute=end_minute)
     declaration = {
-        "start": start_date,
-        "end": end_date,
+        "start": start_date.strftime('%Y-%m-%d %H:%M'),
+        "end": end_date.strftime('%Y-%m-%d %H:%M'),
     }
     data["declaration"] = declaration
     return data
@@ -145,13 +146,16 @@ def main(
     )
     if declaration is None:
         content = click.edit(
-            """Objectifs:
-OBJECTIVES
-Actions:
-ACTIONS
-Résultats:
-RESULTS
+            dedent(
                 """
+                Objectifs:
+                OBJECTIVES
+                Actions:
+                ACTIONS
+                Résultats:
+                RESULTS
+                """
+            )
         )
     else:
         content = declaration.read()
@@ -174,8 +178,7 @@ RESULTS
             return
 
     click.secho('Firing declaration!', bold=True)
-    response = wrapper.declare_log(module_id, payload)
-    response.raise_for_status()
+    wrapper.declare_log(module_id, payload)
 
 
 if __name__ == "__main__":
