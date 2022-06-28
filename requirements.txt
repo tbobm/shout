@@ -1,4 +1,4 @@
 requests
-arrow==0.14.1
+arrow==0.15.1
 etnawrapper>=2.1.1
 click
